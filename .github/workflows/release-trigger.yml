@@ -15,18 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Workflow in Another Repository
-        run: |
-          # Set the required variables
-          repo_owner="REPOSITORY OWNER" 
-          repo_name="REPOSITORY NAME"  
-          event_type="trigger-workflow" 
-          service="${{ github.event.inputs.target_service }}"
-          version="${{ github.event.inputs.target_version }}"
-  
-          curl -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT }}" \
-            https://api.github.com/repos/$repo_owner/$repo_name/dispatches \
-            -d "{\"event_type\": \"$event_type\", \"client_payload\": {\"service\": \"$service\", \"version\": \"$version\", \"unit\": false, \"integration\": true}}"
+      - uses: convictional/trigger-workflow-and-wait@v1.6.1
+        with:
+          owner: ahmed
+          repo: service-ui
+          github_token: ${{ secrets.PAT }}
+          github_user: ahmed
+          workflow_file_name: create-ec2.yml
+          ref: develop
+          wait_interval: 10
+          client_payload: '{}'
+          propagate_failure: false
+          trigger_workflow: true
+          wait_workflow: true
