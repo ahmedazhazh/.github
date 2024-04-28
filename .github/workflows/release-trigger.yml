@@ -20,10 +20,9 @@ jobs:
           owner: ahmedazhazh
           repo: service-ui
           github_token: ${{ secrets.PAT }}
-          github_user: ahmed
           workflow_file_name: create-ec2.yml
           ref: develop
-          wait_interval: 10
+          wait_interval: 60
           client_payload: '{}'
           propagate_failure: false
           trigger_workflow: true
