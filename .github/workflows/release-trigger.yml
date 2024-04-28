@@ -8,29 +8,11 @@ on:
         required: false
 
 jobs:
-  build-docker:
-    name: Trigger Docker image build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: ['service-ui']
-    steps:
-      - uses: convictional/trigger-workflow-and-wait@v1.6.1
-        with:
-          owner: ahmedazhazh
-          repo: ${{ matrix.repo }}
-          github_token: ${{ secrets.PAT }}
-          workflow_file_name: create-ec2.yml
-          ref: develop
-          wait_interval: 60
-          client_payload: '{}'
-          propagate_failure: false
-          trigger_workflow: true
-          wait_workflow: true
+
           
   start-runner:
     name: Start self-hosted EC2 runner
-    needs: build-docker
+    #needs: build-docker
     runs-on: ubuntu-latest
     outputs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
@@ -55,7 +37,7 @@ jobs:
           security-group-id: sg-97ca42e9
           pre-runner-script: |
             sudo yum update -y && \  
-            sudo yum install docker git libicu -y
+            sudo yum install docker docker-compose-plugin git libicu -y
             sudo systemctl enable docker
             sudo systemctl start docker
           aws-resource-tags: > # optional, requires additional permissions
