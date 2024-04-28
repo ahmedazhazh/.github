@@ -37,7 +37,7 @@ jobs:
           security-group-id: sg-97ca42e9
           pre-runner-script: |
             sudo apt update -y && \  
-            sudo apt install docker git libicu -y
+            sudo apt install docker docker-compose git libicu -y
             sudo systemctl enable docker
             sudo systemctl start docker
           aws-resource-tags: > # optional, requires additional permissions
@@ -52,9 +52,7 @@ jobs:
     runs-on: ${{ needs.start-runner.outputs.label }}
     steps:
       - name: Download Docker Compose
-        run: |
-          sudo apt install docker-compose -y
-          curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
+        run: curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
 
       - name: Run Docker container
         run: docker-compose -p reportportal up -d
