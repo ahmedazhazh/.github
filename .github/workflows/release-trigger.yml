@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: convictional/trigger-workflow-and-wait@v1.6.1
         with:
-          owner: ahmed
+          owner: ahmedazhazh
           repo: service-ui
           github_token: ${{ secrets.PAT }}
           github_user: ahmed
