@@ -8,17 +8,14 @@ on:
         required: false
 
 jobs:
-  trigger:
+  build-docker:
+    name: Trigger Docker image build
     runs-on: ubuntu-latest
     strategy:
       matrix:
         repo: ['service-ui']
-    outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: Trigger Docker image build
-        uses: convictional/trigger-workflow-and-wait@v1.6.1
+      - uses: convictional/trigger-workflow-and-wait@v1.6.1
         with:
           owner: ahmedazhazh
           repo: ${{ matrix.repo }}
@@ -30,7 +27,15 @@ jobs:
           propagate_failure: false
           trigger_workflow: true
           wait_workflow: true
-
+          
+  start-runner:
+    name: Start self-hosted EC2 runner
+    needs: build-docker
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -43,7 +48,7 @@ jobs:
         uses: machulav/ec2-github-runner@v2
         with:
           mode: start
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           ec2-image-id: ami-0663b059c6536cac8
           ec2-instance-type: t3.nano
           subnet-id: subnet-9f76cbe8
@@ -58,17 +63,38 @@ jobs:
               {"Key": "Name", "Value": "ec2-github-runner"},
               {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
             ]
-
+            
+  do-job:
+    name: Do the job on the runner
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    steps:
       - name: Download Docker Compose
-        run: curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
-      - name: Start Docker Compose
+        run: |
+          curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
+
+      - name: Run Docker container
         run: docker-compose -p reportportal up -d
 
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner
+      - do-job 
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # to ensure that the runner is stopped even if an error happens
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Stop EC2 runner
-        if: ${{ always() }} # to ensure that the runner is stopped even if an error happens
         uses: machulav/ec2-github-runner@v2
         with:
           mode: stop
-          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           label: ${{ needs.start-runner.outputs.label }}
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
