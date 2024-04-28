@@ -3,22 +3,22 @@ name: Trigger repos
 on:
   workflow_dispatch:
     inputs:
-      target_service:
-        description: 'Input a service name (e.g., demo-app)'
-        required: true
       target_version:
         description: 'Input a version (e.g., v1.0.0)'
-        required: true
+        required: false
 
 jobs:
   trigger:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        repo: ['service-ui', 'service-api', 'service-auth']
     steps:
-      - uses: convictional/trigger-workflow-and-wait@v1.6.1
+      - name: Trigger workflows
+        uses: convictional/trigger-workflow-and-wait@v1.6.1
         with:
           owner: ahmedazhazh
-          repo: service-ui
+          repo: ${{ matrix.repo }}
           github_token: ${{ secrets.PAT }}
           workflow_file_name: create-ec2.yml
           ref: develop
