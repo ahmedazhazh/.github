@@ -53,7 +53,7 @@ jobs:
     steps:
       - name: Download Docker Compose
         run: |
-          sudo apt install docker-compose-plugin -y
+          sudo apt install docker-compose -y
           curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
 
       - name: Run Docker container
