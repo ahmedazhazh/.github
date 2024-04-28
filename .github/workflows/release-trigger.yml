@@ -37,7 +37,7 @@ jobs:
           security-group-id: sg-97ca42e9
           pre-runner-script: |
             sudo yum update -y && \  
-            sudo yum install docker docker-compose-plugin git libicu -y
+            sudo yum install docker git libicu -y
             sudo systemctl enable docker
             sudo systemctl start docker
           aws-resource-tags: > # optional, requires additional permissions
@@ -53,6 +53,7 @@ jobs:
     steps:
       - name: Download Docker Compose
         run: |
+          sudo yum install docker-compose-plugin -y
           curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
 
       - name: Run Docker container
