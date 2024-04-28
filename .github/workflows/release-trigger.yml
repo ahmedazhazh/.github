@@ -1,4 +1,4 @@
-name: Trigger repos
+name: Trigger and Run
 
 on:
   workflow_dispatch:
@@ -12,9 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repo: ['service-ui', 'service-api', 'service-auth']
+        repo: ['service-ui']
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-      - name: Trigger workflows
+      - name: Trigger Docker image build
         uses: convictional/trigger-workflow-and-wait@v1.6.1
         with:
           owner: ahmedazhazh
@@ -27,3 +30,45 @@ jobs:
           propagate_failure: false
           trigger_workflow: true
           wait_workflow: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-0663b059c6536cac8
+          ec2-instance-type: t3.nano
+          subnet-id: subnet-9f76cbe8
+          security-group-id: sg-97ca42e9
+          pre-runner-script: |
+            sudo yum update -y && \  
+            sudo yum install docker git libicu -y
+            sudo systemctl enable docker
+            sudo systemctl start docker
+          aws-resource-tags: > # optional, requires additional permissions
+            [
+              {"Key": "Name", "Value": "ec2-github-runner"},
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+            ]
+
+      - name: Download Docker Compose
+        run: curl -L --remote-name https://raw.githubusercontent.com/reportportal/reportportal/master/docker-compose.yml
+      - name: Start Docker Compose
+        run: docker-compose -p reportportal up -d
+
+      - name: Stop EC2 runner
+        if: ${{ always() }} # to ensure that the runner is stopped even if an error happens
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
