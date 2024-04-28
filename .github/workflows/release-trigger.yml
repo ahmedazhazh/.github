@@ -1,4 +1,4 @@
-name: Trigger and Run
+name: Release pipeline
 
 on:
   workflow_dispatch:
