@@ -1,0 +1,12 @@
+name: Release job
+on: workflow_dispatch
+jobs:
+
+  do-the-job:
+    name: Docker run
+    runs-on: rp-release
+    steps:
+      - name: Pull Docker image 
+        run: docker pull reportportal/service-ui
+      - name: Run Docker container
+        run: docker run --rm -d -p 8080:80 --name=service-ui reportportal/service-ui:latest
