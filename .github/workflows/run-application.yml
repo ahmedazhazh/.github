@@ -18,8 +18,16 @@ jobs:
     runs-on: rp-release
     needs: ec2-start
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: reportportal/reportportal
+
       - name: Run Docker compose up
         run: docker compose -p reportportal up -d
+
+      - name: Run Docker compose down
+        run: docker compose -p reportportal down
 
   ec2-stop:
     runs-on: ubuntu-latest
