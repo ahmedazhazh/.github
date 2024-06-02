@@ -28,6 +28,7 @@ jobs:
  #         wait_workflow: true
           
   ec2-start:
+    name: Start EC2 instance
     runs-on: ubuntu-latest
     #needs: build-docker
     steps:
@@ -59,7 +60,7 @@ jobs:
     steps:
       - name: Checkout code
         run: |
-          git clone https://${{secrets.GITLAB_PERSONAL_ACCESS_TOKEN }}@git.epam.com/EPM-RPP/demo-ui-test.git
+          git clone https://ahmed_azhazh:${{secrets.GITLAB_PERSONAL_ACCESS_TOKEN }}@git.epam.com/EPM-RPP/demo-ui-test.git
       - name: npm install
         run: npm i
       - name: npm test 
@@ -70,6 +71,7 @@ jobs:
 
  # ec2-stop:
  #   runs-on: ubuntu-latest
+ #   name: Stop EC2 instance
  #   needs: docker-compose
  #   steps:
  #     - name: Stop AWS EC2
