@@ -1,5 +1,10 @@
 name: Release job
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'     
+        required: false
 
 jobs:
   build-docker:
@@ -17,7 +22,7 @@ jobs:
           workflow_file_name: create-ec2.yml
           ref: develop
           wait_interval: 60
-          client_payload: '{}'
+          client_payload: '{"version":"${{ github.event.inputs.version }}"}'
           propagate_failure: true
           trigger_workflow: true
           wait_workflow: true
