@@ -2,6 +2,26 @@ name: Release job
 on: workflow_dispatch
 
 jobs:
+  build-docker:
+    name: Trigger Docker image build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['service-ui']
+    steps:
+      - uses: convictional/trigger-workflow-and-wait@v1.6.1
+        with:
+          owner: ahmedazhazh
+          repo: ${{ matrix.repo }}
+          github_token: ${{ secrets.PAT }}
+          workflow_file_name: create-ec2.yml
+          ref: develop
+          wait_interval: 60
+          client_payload: '{}'
+          propagate_failure: true
+          trigger_workflow: true
+          wait_workflow: true
+          
   ec2-start:
     runs-on: ubuntu-latest
     steps:
