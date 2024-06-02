@@ -63,6 +63,8 @@ jobs:
           git clone https://ahmed_azhazh:${{secrets.GITLAB_PERSONAL_ACCESS_TOKEN }}@git.epam.com/EPM-RPP/demo-ui-test.git
       - name: npm install
         run: cd demo-ui-test && npm i
+      - name: Create .env file
+        run: cp /home/ubuntu/.env demo-ui-test
       - name: npm test 
         run: cd demo-ui-test && npm test 
         
