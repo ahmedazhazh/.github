@@ -19,7 +19,7 @@ jobs:
           owner: ahmedazhazh
           repo: ${{ matrix.repo }}
           github_token: ${{ secrets.PAT }}
-          workflow_file_name: create-ec2.yml
+          workflow_file_name: run-ec2.yml
           ref: develop
           wait_interval: 60
           client_payload: '{"version":"${{ github.event.inputs.version }}"}'
