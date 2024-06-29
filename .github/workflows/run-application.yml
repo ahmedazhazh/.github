@@ -14,9 +14,12 @@ jobs:
         repository: reportportal/${{ matrix.repo }}
         releases-only: true
       id: tagstep
-  
+
     - name: Append service version to env file
-      run: echo "SERVICE_${{ matrix.repo | upper | replace('-', '_') }}_TAG=${{ steps.tagstep.outputs.tag }}" >> .env
+      shell: bash
+      run: |
+        TAG_NAME=$(echo "SERVICE_${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
+        echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> .env
 
     - name: Display .env content
       run: cat .env
