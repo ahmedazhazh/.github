@@ -10,12 +10,13 @@ jobs:
   check-tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: tdemin/find-latest-tag@v1
-        name: tag_find
-        with:
-          repo: https://github.com/reportportal/service-authorization
-      - name: Show output
-        run: echo "${{ steps.tag_find.outputs.tag }}"
+    - uses: oprypin/find-latest-tag@v1
+      with:
+        repository: https://github.com/reportportal/service-authorization
+        releases-only: true  # We know that all relevant tags have a GitHub release for them.
+      id: octokit  # The step ID to refer to later.
+  
+    - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
  # build-docker:
  #   name: Trigger Docker image build
  #   runs-on: ubuntu-latest
