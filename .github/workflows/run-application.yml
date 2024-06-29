@@ -15,14 +15,30 @@ jobs:
         releases-only: true
       id: tagstep
 
-    - name: Append service version to env file
+    - name: Save service version to env file
       shell: bash
       run: |
         TAG_NAME=$(echo "SERVICE_${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
-        echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> .env
+        echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> ./${{ matrix.repo }}.env
 
-    - name: Display .env content
-      run: pwd && ls -la && ifconfig
+    - name: Upload .env file
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.repo }}-env
+        path: ./${{ matrix.repo }}.env
+        
+  merge-env-files:
+    needs: check-tag  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Merge env files
+        run: cat service-*.env >> .env
+
+      - name: Display .env content
+        run: cat .env
       
  # build-docker:
  #   name: Trigger Docker image build
