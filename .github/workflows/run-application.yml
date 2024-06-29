@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repo: ['service-ui', 'service-authorization', 'service-api', 'service-index', 'service-auto-analyzer']
+        repo: ['service-index', 'service-ui', 'service-api', 'service-authorization', 'service-jobs', 'service-auto-analyzer', 'service-metrics-gatherer', 'migrations']
     steps:
     - uses: oprypin/find-latest-tag@v1
       with:
