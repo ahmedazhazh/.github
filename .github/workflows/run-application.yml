@@ -11,8 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: tdemin/find-latest-tag@v1
+        name: tag_find
         with:
           repo: https://github.com/reportportal/service-authorization
+      - name: Show output
+        run: echo "${{ steps.tag_find.outputs.tag }}"
  # build-docker:
  #   name: Trigger Docker image build
  #   runs-on: ubuntu-latest
