@@ -35,7 +35,9 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Merge env files
-        run: cat service-*.env >> .env
+        run: |
+          shopt -s globstar
+          cat **/*.env >> .env
 
       - name: Display .env content
         run: cat .env
