@@ -1,25 +1,26 @@
 name: Release job
 on: 
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version'     
-        required: false
 
 jobs:
   check-tag:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repo: ['service-ui', 'service-authorization', 'service-api','service-index','service-analyzer']
+        repo: ['service-ui', 'service-authorization', 'service-api', 'service-index', 'service-auto-analyzer']
     steps:
     - uses: oprypin/find-latest-tag@v1
       with:
         repository: reportportal/${{ matrix.repo }}
-        releases-only: true  # We know that all relevant tags have a GitHub release for them.
-      id: octokit  # The step ID to refer to later.
+        releases-only: true
+      id: tagstep
   
-    - run: echo "${{ matrix.repo }} is at version ${{ steps.octokit.outputs.tag }}"
+    - name: Append service version to env file
+      run: echo "SERVICE_${{ matrix.repo | upper | replace('-', '_') }}_TAG=${{ steps.tagstep.outputs.tag }}" >> .env
+
+    - name: Display .env content
+      run: cat .env
+      
  # build-docker:
  #   name: Trigger Docker image build
  #   runs-on: ubuntu-latest
