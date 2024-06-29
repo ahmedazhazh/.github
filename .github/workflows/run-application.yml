@@ -18,14 +18,13 @@ jobs:
     - name: Save service version to env file
       shell: bash
       run: |
-        TAG_NAME=$(echo "SERVICE_${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
-        echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> ./${{ matrix.repo }}.env
+        TAG_NAME=$(echo "${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
+        echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> ${{ matrix.repo }}.env
 
     - name: Upload .env file
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.repo }}-env
-        path: ./${{ matrix.repo }}.env
         
   merge-env-files:
     needs: check-tag  
@@ -35,9 +34,7 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Merge env files
-        run: |
-          shopt -s globstar
-          cat **/*.env >> .env
+        run: cat **/*.env >> .env
 
       - name: Display .env content
         run: cat .env
