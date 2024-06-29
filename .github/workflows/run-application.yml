@@ -22,7 +22,7 @@ jobs:
         echo "${TAG_NAME}_TAG=${{ steps.tagstep.outputs.tag }}" >> .env
 
     - name: Display .env content
-      run: cat .env
+      run: pwd && ls-la
       
  # build-docker:
  #   name: Trigger Docker image build
