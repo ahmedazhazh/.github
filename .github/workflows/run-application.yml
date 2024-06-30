@@ -57,7 +57,7 @@ jobs:
         run: cat **/*.env >> .env
 
       - name: Display .env content
-        run: cat .env $$ ls -la
+        run: cat .env && ls -la
 
       - name: Run Docker compose up
         run: docker compose -f docker-compose-release.yml -p reportportal up -d
