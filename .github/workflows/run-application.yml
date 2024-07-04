@@ -83,7 +83,7 @@ jobs:
         run:  | 
           cd demo-ui-test
           npm test | tee ./console.log || true
-          sed -rn 's/ReportPortal Launch UUID: ([^\\r\\n]+)/LAUNCH_UUID=\1/ p' ./console.log  >> "$GITHUB_ENV"
+           sed -rn 's|.*launches/all/([0-9]+).*|LAUNCH_UUID=\1|p' ./console.log >> "$GITHUB_ENV"
       - name: Quality Gate
         run: |
           echo "Quality gate"
