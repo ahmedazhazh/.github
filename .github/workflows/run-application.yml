@@ -3,7 +3,8 @@ on:
   workflow_dispatch:
   
 env:
-  RP_INSTANCE: 'https://reportportal.epam.com'
+  RPENDPOINT: 'https://reportportal.epam.com'
+  RPPROJECT: 'ahmed_azhazh_personal'
   SCRIPT_TIMEOUT_SECONDS: 60
   REQUEST_TIMEOUT_SECONDS: 60
   
@@ -93,7 +94,7 @@ jobs:
           while ( [ -z "$QUALITY_GATE_STATUS" ] || [ "$QUALITY_GATE_STATUS" == "UNDEFINED" ] ) && [ $(( $(date +%s) - START_TIME )) -lt ${{ env.SCRIPT_TIMEOUT_SECONDS }} ]; do
             echo "Waiting for quality gate status..."
             sleep 10
-            QUALITY_GATE_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.RP_DEMO_KEY }}" --max-time "${{ env.REQUEST_TIMEOUT_SECONDS }}" "${{ env.RP_INSTANCE }}/api/v1/report_portal_demo/launch/${LAUNCH_UUID}")
+            QUALITY_GATE_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.RPAPIKEY }}" --max-time "${{ env.REQUEST_TIMEOUT_SECONDS }}" "${{ env.RPENDPOINT }}/api/v1/${{ env.RPPROJECT }}/launch/${LAUNCH_UUID}")
             QUALITY_GATE_STATUS=$(echo "$QUALITY_GATE_JSON" | jq -r '.metadata.qualityGate.status // empty')
           done
           if [ "$QUALITY_GATE_STATUS" != "PASSED" ]; then
