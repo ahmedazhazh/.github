@@ -48,6 +48,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: reportportal/${{ matrix.repo }}
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
           
   docker-build:
     name: Build Docker Image
@@ -55,8 +57,8 @@ jobs:
     with:
       aws-region: 'us-east-1' # replace with your AWS region
       ecr-repository: reportportal/${{ matrix.repo }}
-      image-tag: '${{ steps.set_tag.outputs.tag }}'
-      version: '${{ steps.set_tag.outputs.tag }}-${{ github.run_number }}'
+      image-tag: '${{ needs.check-tag.outputs.tag }}'
+      version: '${{ needs.check-tag.outputs.tag }}-${{ github.run_number }}'
     strategy:
       matrix:
         repo: ['service-index', 'service-ui', 'service-api', 'service-authorization', 'service-jobs', 'service-auto-analyzer', 'service-metrics-gatherer', 'migrations']
