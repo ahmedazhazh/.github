@@ -54,7 +54,7 @@ jobs:
           repository: reportportal/${{ matrix.repo }}
           
       - name: Get next Docker version
-        run: pwd && ls -la && tree
+        run: pwd && ls -la && ls-la .github/workflows && tree
         
       - name: Build Docker Image
         uses: ./.github/workflows/build-docker-image.yaml@main
