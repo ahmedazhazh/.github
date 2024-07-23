@@ -59,6 +59,11 @@ jobs:
       ecr-repository: reportportal/${{ matrix.repo }}
       image-tag: '${{ needs.check-tag.outputs.tag }}'
       version: '${{ needs.check-tag.outputs.tag }}-${{ github.run_number }}'
+    secrets:
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       GH_USER: ${{ secrets.GH_USER }}
+       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     strategy:
       matrix:
         repo: ['service-index', 'service-ui', 'service-api', 'service-authorization', 'service-jobs', 'service-auto-analyzer', 'service-metrics-gatherer', 'migrations']
