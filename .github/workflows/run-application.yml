@@ -151,7 +151,7 @@ jobs:
         with:
           owner: ahmedazhazh
           repo: ${{ matrix.repo }}
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.GH_TOKEN }}
           workflow_file_name: dockerhub-release-revision.yml
           ref: develop
           wait_interval: 60
