@@ -29,7 +29,7 @@ jobs:
       - name: Get next Docker version
         id: set_tag
         run: |
-            curl https://raw.githubusercontent.com/ahmedazhazh/.github/main/.github/workflows/build-docker-image.yaml -o .github/workflows/action.yaml
+            curl https://raw.githubusercontent.com/ahmedazhazh/.github/main/.github/workflows/build-docker-image.yaml -o ./.github/workflows/action.yaml
             DOCKER_IMAGE_NAME="reportportal/${{ matrix.repo }}"
             INPUT_VERSION=${{ steps.get_version.outputs.tag }}
             TAG_NAME=$(echo "${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
@@ -50,10 +50,10 @@ jobs:
           path: ./${{ matrix.repo }}.env
               
       - name: Get next Docker version
-        run: pwd && ls -la && cat .github/workflows/action.yaml && tree
+        run: pwd && ls -la && cat ./.github/workflows/action.yaml && tree
         
       - name: Build Docker Image
-        uses: .github/workflows/action.yaml@main
+        uses: ./.github/workflows/action.yaml
         with:
           aws-region: 'us-east-1' # replace with your AWS region
           ecr-repository: reportportal/${{ matrix.repo }}
