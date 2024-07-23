@@ -50,7 +50,7 @@ jobs:
           path: ./${{ matrix.repo }}.env
 
       - name: Build Docker Image
-        uses: ./build-docker-image.yaml@main
+        uses: reportportal/.github/.github/workflows/build-docker-image.yaml@main
         with:
           aws-region: 'us-east-1' # replace with your AWS region
           ecr-repository: reportportal/${{ matrix.repo }}
