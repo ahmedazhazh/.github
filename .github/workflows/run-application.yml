@@ -16,7 +16,9 @@ jobs:
         repo: ['service-index', 'service-ui', 'service-api', 'service-authorization', 'service-jobs', 'service-auto-analyzer', 'service-metrics-gatherer', 'migrations']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          repository: reportportal/${{ matrix.repo }}
 
       - id: get_version
         uses: oprypin/find-latest-tag@v1
@@ -29,6 +31,7 @@ jobs:
         run: |
             DOCKER_IMAGE_NAME="reportportal/${{ matrix.repo }}"
             INPUT_VERSION=${{ steps.get_version.outputs.tag }}
+            TAG_NAME=$(echo "${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
             TAGS_JSON=$(curl -s "https://hub.docker.com/v2/repositories/${DOCKER_IMAGE_NAME}/tags/?page_size=1000")
             LATEST_REVISION_NUMBER=$(echo "$TAGS_JSON" | jq -r --arg INPUT_VERSION "$INPUT_VERSION" '.results[] | select(.name | startswith($INPUT_VERSION+"-r")) | .name' | awk -F-r '{print $2}' | sort -nr | head -n1)
             if [[ -z "$LATEST_REVISION_NUMBER" ]]; then
@@ -37,7 +40,7 @@ jobs:
               NEXT_VERSION="$INPUT_VERSION-r$(($LATEST_REVISION_NUMBER + 1))"
             fi
             echo "::set-output name=tag::${NEXT_VERSION}"
-            echo "${NEXT_VERSION}_TAG=${NEXT_VERSION}" >> ./${{ matrix.repo }}.env
+            echo "${TAG_NAME}_TAG=${NEXT_VERSION}" >> ./${{ matrix.repo }}.env
 
       - name: Upload .env file
         uses: actions/upload-artifact@v2
@@ -50,7 +53,7 @@ jobs:
         with:
           aws-region: 'us-east-1' # replace with your AWS region
           ecr-repository: reportportal/${{ matrix.repo }}
-          image-tag: '${{ steps.set_tag.outputs.tag }}-${{ github.run_number }}'
+          image-tag: '${{ steps.set_tag.outputs.tag }}'
           version: '${{ steps.set_tag.outputs.tag }}-${{ github.run_number }}'
           
   ec2-start:
