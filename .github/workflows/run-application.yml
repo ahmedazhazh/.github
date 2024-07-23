@@ -15,6 +15,11 @@ jobs:
       matrix:
         repo: ['service-index', 'service-ui', 'service-api', 'service-authorization', 'service-jobs', 'service-auto-analyzer', 'service-metrics-gatherer', 'migrations']
     steps:
+      - name: Checkout Docker
+        uses: actions/checkout@v3
+        with:
+          repository: reportportal/${{ matrix.repo }}
+          
       - id: get_version
         uses: oprypin/find-latest-tag@v1
         with:
@@ -24,7 +29,7 @@ jobs:
       - name: Get next Docker version
         id: set_tag
         run: |
-            ls -la
+            curl https://raw.githubusercontent.com/ahmedazhazh/.github/main/.github/workflows/build-docker-image.yaml -o build.yaml
             DOCKER_IMAGE_NAME="reportportal/${{ matrix.repo }}"
             INPUT_VERSION=${{ steps.get_version.outputs.tag }}
             TAG_NAME=$(echo "${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
@@ -43,21 +48,12 @@ jobs:
         with:
           name: ${{ matrix.repo }}-env
           path: ./${{ matrix.repo }}.env
-      
-      - name: Checkout
-        uses: actions/checkout@v3
-
-        
-      - name: Checkout Docker
-        uses: actions/checkout@v3
-        with:
-          repository: reportportal/${{ matrix.repo }}
-          
+              
       - name: Get next Docker version
-        run: pwd && ls -la && ls -la .github/workflows && tree
+        run: pwd && ls -la && cat ./build.yaml && tree
         
       - name: Build Docker Image
-        uses: ./.github/workflows/build-docker-image.yaml@main
+        uses: ./build.yaml
         with:
           aws-region: 'us-east-1' # replace with your AWS region
           ecr-repository: reportportal/${{ matrix.repo }}
