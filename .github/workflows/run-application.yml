@@ -29,6 +29,7 @@ jobs:
       - name: Get next Docker version
         id: set_tag
         run: |
+            ls -la
             DOCKER_IMAGE_NAME="reportportal/${{ matrix.repo }}"
             INPUT_VERSION=${{ steps.get_version.outputs.tag }}
             TAG_NAME=$(echo "${{ matrix.repo }}" | tr [:lower:]- [:upper:]_)
@@ -39,11 +40,11 @@ jobs:
             else
               NEXT_VERSION="$INPUT_VERSION-r$(($LATEST_REVISION_NUMBER + 1))"
             fi
-            echo "::set-output name=tag::${NEXT_VERSION}"
+            echo "tag=${NEXT_VERSION}" >> $GITHUB_OUTPUT
             echo "${TAG_NAME}_TAG=${NEXT_VERSION}" >> ./${{ matrix.repo }}.env
 
       - name: Upload .env file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.repo }}-env
           path: ./${{ matrix.repo }}.env
